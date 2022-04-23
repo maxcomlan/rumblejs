@@ -1,11 +1,11 @@
-# Vee
+# RumbleJS
 
 Reactive Storage wrapped around either localStorage or sessionStorage, in the browser. you chooose which engine fits your needs.
 
 It works like this:
 
 ```
-window.rls = ReactiveStorage(localStorage);
+const rls = RumbleJSStorage(localStorage);
 
 rls.onRead("user", (event) => {
     console.log("User lu", event.value);
@@ -27,19 +27,19 @@ rls.setItem("user", "Paul Logan");
 rls.getItem("user");
 ```
 
-Principe: 
+How it works: 
 
-*Vee* encapsule `localStorage` ou `sessionStorage` pour fournir  la meme fonctionnalité que `localStorage` ou `sessionStorage`, mais est capable de réagir a des changement appliqués aux clés stockées par lui, sur demande. Les évenements transitent par l'émetteur associé au document, pour permettre d'avoir les appels aux fonctions sans blocage ou __promisification__.
+*RumbleJS* encapsulates either `localStorage` or `sessionStorage` to provide the same functionality as `localStorage` or `sessionStorage`, but is able to react to changes applied to the keys stored by it, on demand. Events are passed through the sender associated with the document, to allow function calls without latency or __promise__.
 
 
-## Fonctions et attributs disponibles
+## Available functions and attributes
 
 ### readonly length: number
-    Retourne le nombre total de clés disponibles dans le stockage
+    Returns the total number of keys available in the storage
 
 
 ### clear(): void
-    Vide le stockage, et declenche l'evenement `clear`. Interceptable avec `onClear`.
+    Clears the storage, and triggers the `clear` event. Interceptable with `onClear`.
 
 
 ### getItem(key: string): string | null
