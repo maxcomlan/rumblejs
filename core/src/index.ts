@@ -1,6 +1,12 @@
+export const StorageTypes = {
+    string: "string", 
+    object: "object" , 
+    number: "number",
+    boolean: "boolean"
+}
 
 export declare namespace Rumble {
-
+    type Types =  keyof typeof StorageTypes;
     export type Event = "set" | "get" | "remove" | "clear";
     export type EventListener = (details: Reaction) => any;
     export interface Reaction {
@@ -132,6 +138,49 @@ export declare namespace Rumble {
 }
 
 
+export function cast(value: string | null | undefined, type: Rumble.Types = "string") {
+    switch(type) {
+        case "string": {
+            return value;
+        }
+        case "boolean": {
+            if (!value) {
+                return false;
+            }
+            try {
+                let parsed = ["true", '1'].includes(value.toLowerCase());
+                return parsed;
+            } catch (error) {
+                return false;
+            }
+        }
+        case "object": {
+            if (!value) {
+                return undefined;
+            }
+            try {
+                let parsed = JSON.parse(value);
+                return parsed;
+            } catch (error) {
+                return undefined;
+            }
+        }
+        case "number": {
+            if (!value) {
+                return undefined;
+            }
+            try {
+                let parsed = parseFloat(value);
+                return parsed;
+            } catch (error) {
+                return undefined;
+            }
+        }
+        default: 
+            return undefined;
+    }
+}
+
 function SetupStorage(block: Storage): Rumble.ReactiveStorage {
     let reactiveWrapper = {
         $__id: crypto.randomUUID(),
@@ -180,41 +229,17 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
 
         getObject(key: string) {
             let item = block.getItem(key);
-            if (!item) {
-                return null;
-            }
-            try {
-                let parsed = JSON.parse(item);
-                return parsed;
-            } catch (error) {
-                return null;
-            }
+            return cast(item, "object");
         },
 
         getNumber(key: string) {
             let item = block.getItem(key);
-            if (!item) {
-                return null;
-            }
-            try {
-                let parsed = parseFloat(item);
-                return parsed;
-            } catch (error) {
-                return null;
-            }
+            return cast(item, "number");
         },
 
         getBoolean(key: string) {
             let item = block.getItem(key);
-            if (!item) {
-                return false;
-            }
-            try {
-                let parsed = ["true", '1'].includes(item.toLowerCase());
-                return parsed;
-            } catch (error) {
-                return false;
-            }
+            return cast(item, "boolean");
         },
 
         getMatches(pattern: string | RegExp) {
