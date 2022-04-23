@@ -1,113 +1,115 @@
-export type VeeEvent = "set" | "get" | "remove" | "clear";
 
-export type VeeEventListener = (event: VeeEvent, details: VeeReaction) => any;
+export declare namespace Rumble {
 
-export interface VeeReaction {
-    event: VeeEvent,
-    key?: string;
-    value?: any;
-    [key: string]: any;
+    export type Event = "set" | "get" | "remove" | "clear";
+    export type EventListener = (event: Event, details: Reaction) => any;
+    export interface Reaction {
+        event: Event,
+        key?: string;
+        value?: any;
+        [key: string]: any;
+    }
+    export type Subscription = {
+        id: string;
+        event: Event;
+        key?: string;
+        listener: EventListener;
+        cancel: () => any
+    }
+    type SubscribeParams = {
+        event: Event,
+        listener: EventListener,
+        key?: string,
+    }
+
+    interface ReactiveStorage {
+        $__block: Storage;
+        /** Returns the number of key/value pairs. */
+        readonly length: number;
+        /**
+         * Removes all key/value pairs, if there are any.
+         *
+         * Dispatches a storage event on Window objects holding an equivalent Storage object.
+         */
+        clear(): void;
+
+        /** Returns the current value associated with the given key, or null if the given key does not exist. */
+        getItem(key: string): string | null;
+
+        /** Returns the current value associated with the given key, or null if the given key does not exist. */
+        getString(key: string): string | null;
+
+        /** Returns the current object value associated with the given key, or null if the given key does not exist. */
+        getObject(key: string): any | null;
+
+        /** Returns the current number value associated with the given key, or null if the given key does not exist. */
+        getNumber(key: string): number | null;
+
+        /** Returns the current boolean value associated with the given key, or null if the given key does not exist. */
+        getBoolean(key: string): boolean;
+
+        /** Returns the keys in the block storage that match the given pattern*/
+        getMatches(pattern: string | RegExp): { key: string, value: string | null }[];
+
+        /** Returns the keys in the block storage that match the given pattern*/
+        getNonNullMatches(pattern: string | RegExp): { key: string, value: string }[];
+
+        key(index: number): string | null;
+        /**
+         * Removes the key/value pair with the given key, if a key/value pair with the given key exists.
+         *
+         * Dispatches a storage event on Window objects holding an equivalent Storage object.
+         */
+        removeItem(key: string): void;
+        /**
+         * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
+         *
+         * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
+         *
+         * Dispatches a storage event on Window objects holding an equivalent Storage object.
+         */
+        setItem(key: string, value: string): void;
+
+        /**
+         * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+         */
+        on(params: SubscribeParams): Subscription;
+        /**
+         * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+         */
+        onRead(key: SubscribeParams['key'], listener: SubscribeParams['listener']): Subscription;
+        /**
+          * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+          */
+        onWrite(key: SubscribeParams['key'], listener: SubscribeParams['listener']): Subscription;
+        /**
+         * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+         */
+        onRemove(key: SubscribeParams['key'], listener: SubscribeParams['listener']): Subscription;
+        /**
+        * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+        */
+        onClear(listener: SubscribeParams['listener']): Subscription;
+        /**
+         * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
+         */
+        on(params: SubscribeParams): Subscription;
+        [key: string]: any;
+    }
+
 }
 
-export type VeeSubscription = {
-    id: string;
-    event: VeeEvent;
-    key?: string;
-    listener: VeeEventListener;
-    cancel: () => any
-}
 
-type VeeSubscribeParams = {
-    event: VeeEvent,
-    listener: VeeEventListener,
-    key?: string,
-}
-
-interface VeeStorage {
-    $__block: Storage;
-    /** Returns the number of key/value pairs. */
-    readonly length: number;
-    /**
-     * Removes all key/value pairs, if there are any.
-     *
-     * Dispatches a storage event on Window objects holding an equivalent Storage object.
-     */
-    clear(): void;
-
-    /** Returns the current value associated with the given key, or null if the given key does not exist. */
-    getItem(key: string): string | null;
-
-    /** Returns the current value associated with the given key, or null if the given key does not exist. */
-    getString(key: string): string | null;
-
-    /** Returns the current object value associated with the given key, or null if the given key does not exist. */
-    getObject(key: string): any | null;
-
-    /** Returns the current number value associated with the given key, or null if the given key does not exist. */
-    getNumber(key: string): number | null;
-
-    /** Returns the current boolean value associated with the given key, or null if the given key does not exist. */
-    getBoolean(key: string): boolean;
-
-    /** Returns the keys in the block storage that match the given pattern*/
-    getMatches(pattern: string | RegExp): { key: string, value: string | null }[];
-
-    /** Returns the keys in the block storage that match the given pattern*/
-    getNonNullMatches(pattern: string | RegExp): { key: string, value: string }[];
-
-    key(index: number): string | null;
-    /**
-     * Removes the key/value pair with the given key, if a key/value pair with the given key exists.
-     *
-     * Dispatches a storage event on Window objects holding an equivalent Storage object.
-     */
-    removeItem(key: string): void;
-    /**
-     * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
-     *
-     * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
-     *
-     * Dispatches a storage event on Window objects holding an equivalent Storage object.
-     */
-    setItem(key: string, value: string): void;
-
-    /**
-     * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-     */
-    on(params: VeeSubscribeParams): VeeSubscription;
-    /**
-     * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-     */
-    onRead(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']): VeeSubscription;
-    /**
-      * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-      */
-    onWrite(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']): VeeSubscription;
-    /**
-     * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-     */
-    onRemove(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']): VeeSubscription;
-    /**
-    * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-    */
-    onClear(listener: VeeSubscribeParams['listener']): VeeSubscription;
-    /**
-     * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
-     */
-    on(params: VeeSubscribeParams): VeeSubscription;
-    [key: string]: any;
-}
-
-function Vee(block: Storage): VeeStorage {
+function SetupStorage(block: Storage): Rumble.ReactiveStorage {
     let reactiveWrapper = {
         $__id: crypto.randomUUID(),
         $__block: block,
-        $__buildEvent(ev: VeeEvent) {
+        $__buildEvent(ev: Rumble.Event) {
             return `storage.reactive.${this.$__id}/${ev}`;
         },
-        $__dispatch(ev: VeeEvent, details: any) {
+        $__dispatch(ev: Rumble.Event, details: any) {
             document.dispatchEvent(
-                new CustomEvent<VeeReaction>(
+                new CustomEvent<Rumble.Reaction>(
                     this.$__buildEvent(ev),
                     {
                         detail: {
@@ -244,15 +246,15 @@ function Vee(block: Storage): VeeStorage {
             );
         },
 
-        on(params: VeeSubscribeParams) {
+        on(params: Rumble.SubscribeParams) {
             let rx = this;
-            let documentListener = (ev: CustomEvent<VeeReaction>) => {
-                if(ev.detail.key === params.key) {
+            let documentListener = (ev: CustomEvent<Rumble.Reaction>) => {
+                if (ev.detail.key === params.key) {
                     params.listener(ev.detail.event, ev.detail);
                 }
             }
             document.addEventListener(this.$__buildEvent(params.event) as any, documentListener);
-            let subscription: VeeSubscription = {
+            let subscription: Rumble.Subscription = {
                 id: crypto.randomUUID(),
                 key: params.key,
                 event: params.event,
@@ -264,7 +266,7 @@ function Vee(block: Storage): VeeStorage {
             return subscription;
         },
 
-        onRead(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']) {
+        onRead(key: Rumble.SubscribeParams['key'], listener: Rumble.SubscribeParams['listener']) {
             return this.on({
                 event: "get",
                 key,
@@ -272,7 +274,7 @@ function Vee(block: Storage): VeeStorage {
             });
         },
 
-        onWrite(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']) {
+        onWrite(key: Rumble.SubscribeParams['key'], listener: Rumble.SubscribeParams['listener']) {
             return this.on({
                 event: "set",
                 key,
@@ -280,7 +282,7 @@ function Vee(block: Storage): VeeStorage {
             });
         },
 
-        onRemove(key: VeeSubscribeParams['key'], listener: VeeSubscribeParams['listener']) {
+        onRemove(key: Rumble.SubscribeParams['key'], listener: Rumble.SubscribeParams['listener']) {
             return this.on({
                 event: "remove",
                 key,
@@ -288,7 +290,7 @@ function Vee(block: Storage): VeeStorage {
             });
         },
 
-        onClear(listener: VeeSubscribeParams['listener']) {
+        onClear(listener: Rumble.SubscribeParams['listener']) {
             return this.on({
                 event: "clear",
                 key: "",
@@ -300,4 +302,4 @@ function Vee(block: Storage): VeeStorage {
     return reactiveWrapper;
 }
 
-export default Vee;
+export default SetupStorage;

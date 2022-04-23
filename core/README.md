@@ -5,26 +5,33 @@ Reactive Storage wrapped around either localStorage or sessionStorage, in the br
 It works like this:
 
 ```
-const rls = RumbleJSStorage(localStorage);
+import SetupStorage from "rumblejs";
 
-rls.onRead("user", (event) => {
-    console.log("User lu", event.value);
+const rls = SetupStorage(localStorage);
+
+const readSubscriber = rls.onRead("user", (event) => {
+    console.log("User readed", event.value);
 });
 
-rls.onWrite("user", (event) => {
+const writeSubscriber = rls.onWrite("user", (event) => {
     console.log(event.previous, event.value);
 });
 
-rls.onRemove("user", (event) => {
-    console.log("User profile removed. Need to signin again");
+const removeSubscriber = rls.onRemove("user", (event) => {
+    console.log("User removed. Need to signin again");
 });
 
-rls.onClear(() => {
+const clearSubscriber = rls.onClear(() => {
     console.log("Storage has been cleared");
 });
 
 rls.setItem("user", "Paul Logan");
 rls.getItem("user");
+rls.removeItem("user");
+
+readSubscriber.cancel();
+/// same for other subscribers
+
 ```
 
 How it works: 
