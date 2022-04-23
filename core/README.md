@@ -4,7 +4,7 @@ Reactive Storage wrapped around either localStorage or sessionStorage, in the br
 
 It works like this:
 
-```
+```javascript 
 import SetupStorage from "rumblejs";
 
 const rls = SetupStorage(localStorage);
@@ -30,6 +30,9 @@ rls.getItem("user");
 rls.removeItem("user");
 
 readSubscriber.cancel();
+writeSubscriber.cancel();
+removeSubscriber.cancel();
+clearSubscriber.cancel();
 /// same for other subscribers
 
 ```
@@ -42,45 +45,44 @@ How it works:
 ## Available functions and attributes
 
 ### readonly length: number
-    Returns the total number of keys available in the storage
+Returns the total number of keys available in the storage
 
 
 ### clear(): void
-    Clears the storage, and triggers the `clear` event. Interceptable with `onClear`.
+Clears the storage, and triggers the `clear` event. Interceptable with `onClear`.
 
 
 ### getItem(key: string): string | null
-
+Returns the current value associated with the given key, or null if the given key does not exist
 
 ### getString(key: string): string | null
-
+Returns the current value associated with the given key, or null if the given key does not exist
 
 ### getObject(key: string): any | null
-
+Returns the current value associated with the given key with automatic conversion to Javascript Object with `JSON.parse`, or null if the given key does not exist
     
 ### getNumber(key: string): number | null
-
+Returns the current value associated with the given key with automatic parsing to number with `parseFloat`, or null if the given key does not exist
 
 ### getBoolean(key: string): boolean
+Returns the current value associated with the given key with automatic parsing to boolean by checking if the value is equal to `true` or `1`, or false if the given key does not exist
 
 
 ### getMatches(pattern: string | RegExp): { key: string, value: string | null }[]
+Returns every key value pair where the key match the given pattern. if each key-pair, the value might be null
 
 
 ### getNonNullMatches(pattern: string | RegExp): { key: string, value: string }[]
-
+Returns every key value pair where the key match the given pattern. if each key-pair, but skip keys with null values.
 
 ### key(index: number): string | null
-
+Return the key at the specified index
 
 ### removeItem(key: string): void
-
+Remove the specified key from the storage.
 
 ### setItem(key: string, value: string): void
-
-
-### on(params: SubscribeParams): Subscription
-
+Append the given key value to storage.
 
 ### onRead(key: SubscribeParams['key'], listener: SubscribeParams['listener']): Subscription
 

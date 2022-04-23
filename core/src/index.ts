@@ -69,6 +69,38 @@ export declare namespace Rumble {
          * Dispatches a storage event on Window objects holding an equivalent Storage object.
          */
         setItem(key: string, value: string): void;
+        /**
+         * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
+         *
+         * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
+         *
+         * Dispatches a storage event on Window objects holding an equivalent Storage object.
+         */
+        setObject(key: string, value: any): void;
+        /**
+        * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
+        *
+        * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
+        *
+        * Dispatches a storage event on Window objects holding an equivalent Storage object.
+        */
+        setBoolean(key: string, value: boolean): void;
+        /**
+         * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
+         *
+         * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
+         *
+         * Dispatches a storage event on Window objects holding an equivalent Storage object.
+         */
+        setNumber(key: string, value: number): void;
+        /**
+        * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
+        *
+        * Throws a "QuotaExceededError" DOMException exception if the new value couldn't be set. (Setting could fail if, e.g., the user has disabled storage for the site, or if the quota has been exceeded.)
+        *
+        * Dispatches a storage event on Window objects holding an equivalent Storage object.
+        */
+        setString(key: string, value: string): void;
 
         /**
          * Store the given listener as a subscription function that can later react to changes made on the storage block, through exposed functions;
@@ -211,6 +243,58 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         setItem(key: string, value: string) {
+            let previous = this.getItem(key);
+            block.setItem(key, value);
+            this.$__dispatch(
+                "set",
+                {
+                    key: key,
+                    value,
+                    previous
+                }
+            );
+        },
+
+        setObject(key: string, value: any) {
+            let previous = this.getItem(key);
+            block.setItem(key, JSON.stringify(value));
+            this.$__dispatch(
+                "set",
+                {
+                    key: key,
+                    value,
+                    previous
+                }
+            );
+        },
+
+        setNumber(key: string, value: number) {
+            let previous = this.getItem(key);
+            block.setItem(key, value + '');
+            this.$__dispatch(
+                "set",
+                {
+                    key: key,
+                    value,
+                    previous
+                }
+            );
+        },
+
+        setBoolean(key: string, value: boolean) {
+            let previous = this.getItem(key);
+            block.setItem(key, value+"");
+            this.$__dispatch(
+                "set",
+                {
+                    key: key,
+                    value,
+                    previous
+                }
+            );
+        },
+
+        setString(key: string, value: string) {
             let previous = this.getItem(key);
             block.setItem(key, value);
             this.$__dispatch(
