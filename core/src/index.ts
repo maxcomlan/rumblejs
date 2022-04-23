@@ -2,7 +2,7 @@
 export declare namespace Rumble {
 
     export type Event = "set" | "get" | "remove" | "clear";
-    export type EventListener = (event: Event, details: Reaction) => any;
+    export type EventListener = (details: Reaction) => any;
     export interface Reaction {
         event: Event,
         key?: string;
@@ -249,8 +249,8 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         on(params: Rumble.SubscribeParams) {
             let rx = this;
             let documentListener = (ev: CustomEvent<Rumble.Reaction>) => {
-                if (ev.detail.key === params.key) {
-                    params.listener(ev.detail.event, ev.detail);
+                if (ev.detail.key === params.key && ev.detail.event === params.event) {
+                    params.listener(ev.detail);
                 }
             }
             document.addEventListener(this.$__buildEvent(params.event) as any, documentListener);
