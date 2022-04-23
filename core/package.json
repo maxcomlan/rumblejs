@@ -1,9 +1,9 @@
 {
-  "name": "vee",
+  "name": "rumblejs",
   "version": "1.0.0",
-  "description": "Reactive Storage in the browser.",
+  "description": "Reactive Data Storage in the browser.",
   "main": "lib/index.js",
-  "repository": "https://github.com/themx05/vee",
+  "repository": "https://github.com/themx05/rumblejs",
   "author": {
     "name": "Maximilien COMLAN",
     "email": "maximiliencomlan05@gmail.com",
@@ -20,7 +20,7 @@
   },
   "bugs": {
     "email": "maximiliencomlan05@gmail.com",
-    "url": "https://github.com/themx05/vee"
+    "url": "https://github.com/themx05/rumblejs"
   },
   "files": [
     "lib/**/*"
