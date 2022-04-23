@@ -1,0 +1,29 @@
+{
+  "name": "vee",
+  "version": "1.0.0",
+  "description": "Reactive Storage in the browser.",
+  "main": "lib/index.js",
+  "repository": "https://github.com/themx05/vee",
+  "author": {
+    "name": "Maximilien COMLAN",
+    "email": "maximiliencomlan05@gmail.com",
+    "url": "https://github.com/themx05"
+  },
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc",
+    "prepublish": "yarn build"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.3"
+  },
+  "bugs": {
+    "email": "maximiliencomlan05@gmail.com",
+    "url": "https://github.com/themx05/vee"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "types": "lib/index.d.ts"
+}
