@@ -1,6 +1,6 @@
 {
   "name": "rumblejs",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Reactive Data Storage in the browser.",
   "main": "lib/index.js",
   "repository": "https://github.com/themx05/rumblejs",

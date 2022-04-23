@@ -6,7 +6,7 @@ export const StorageTypes = {
 }
 
 export declare namespace Rumble {
-    type Types =  keyof typeof StorageTypes;
+    export type Types =  keyof typeof StorageTypes;
     export type Event = "set" | "get" | "remove" | "clear";
     export type EventListener = (details: Reaction) => any;
     export interface Reaction {
