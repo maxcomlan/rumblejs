@@ -35,6 +35,9 @@ removeSubscriber.cancel();
 clearSubscriber.cancel();
 /// same for other subscribers
 
+// new feature: listen read/write on any key using '*'
+const writeAnySubscriber = rls.onWrite('*',function(event){console.log('hello', event)})
+
 ```
 
 How it works: 
