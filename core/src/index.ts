@@ -358,7 +358,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         on(params: Rumble.SubscribeParams) {
             let rx = this;
             let documentListener = (ev: CustomEvent<Rumble.Reaction>) => {
-                if (ev.detail.key === params.key && ev.detail.event === params.event) {
+                if (( params.key === '*' || ev.detail.key === params.key ) && ev.detail.event === params.event) {
                     params.listener(ev.detail);
                 }
             }
