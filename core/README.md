@@ -41,8 +41,14 @@ const writeAnySubscriber = rls.onWrite('*',function(event){console.log('hello', 
 // new feature: execute subscribers sync. default is async by `document.dispatchEvent`
 rls.on({
     event:'get',
-    key:'ok',
+    key:'*',
     listener(detail){console.log(detail)},
+    sync: true,
+})
+rls.on({
+    event:'get',
+    key:'age',
+    listener(detail){console.log('key "age" is fetched')},
     sync: true,
 })
 
