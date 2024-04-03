@@ -375,7 +375,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         on(params: Rumble.SubscribeParams) {
 
             if(params.sync){
-                watchers = allWatchers[params.event];
+                const watchers = allWatchers[params.event];
                 if (!watchers[params.key]) {
                     watchers[params.key] = [];
                 }
