@@ -26,6 +26,7 @@ export declare namespace Rumble {
         event: Event,
         listener: EventListener,
         key?: string,
+        sync?: boolean,
     }
 
     interface ReactiveStorage {
@@ -181,6 +182,13 @@ export function cast(value: string | null | undefined, type: Rumble.Types = "str
     }
 }
 
+const allWatchers = {
+  get: {},
+  set: {},
+  remove: {},
+  clear: {},
+}
+
 function SetupStorage(block: Storage): Rumble.ReactiveStorage {
     let reactiveWrapper = {
         $__id: crypto.randomUUID(),
@@ -189,6 +197,8 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             return `storage.reactive.${this.$__id}/${ev}`;
         },
         $__dispatch(ev: Rumble.Event, details: any) {
+            this.$__dispatchSync(ev, details);
+            
             document.dispatchEvent(
                 new CustomEvent<Rumble.Reaction>(
                     this.$__buildEvent(ev),
@@ -200,6 +210,13 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
                     }
                 )
             );
+        },
+        $__dispatchSync(ev: Rumble.Event, details: any) {
+            if (allWatchers[ev][details.key] && allWatchers[ev][details.key].length > 0) {
+                allWatchers[ev][details.key].forEach(fn => {
+                    fn(details);
+                });
+            }
         },
 
         get length() {
@@ -356,6 +373,27 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         on(params: Rumble.SubscribeParams) {
+
+            if(params.sync){
+                watchers = allWatchers[params.event];
+                if (!watchers[params.key]) {
+                    watchers[params.key] = [];
+                }
+
+                const index = watchers[params.key].push(params.listener) -1;
+                let subscription: Rumble.Subscription = {
+                    id: crypto.randomUUID(),
+                    key: params.key,
+                    event: params.event,
+                    listener: params.listener,
+                    cancel() {
+                        return allWatchers[params.event][params.key].splice(index, 1);
+                    }
+                };
+                return subscription;
+            }
+
+            
             let rx = this;
             let documentListener = (ev: CustomEvent<Rumble.Reaction>) => {
                 if (( params.key === '*' || ev.detail.key === params.key ) && ev.detail.event === params.event) {
