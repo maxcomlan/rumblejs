@@ -42,14 +42,14 @@ const writeAnySubscriber = rls.onWrite('*',function(event){console.log('hello', 
 rls.on({
     event:'get',
     key:'*',
-    listener(detail){console.log(detail)},
     sync: true,
+    listener(detail){console.log(detail)},
 })
 rls.on({
     event:'get',
     key:'age',
-    listener(detail){console.log('key "age" is fetched')},
     sync: true,
+    listener(detail){console.log('key "age" is fetched')},
 })
 
 ```
