@@ -38,6 +38,14 @@ clearSubscriber.cancel();
 // new feature: listen read/write on any key using '*'
 const writeAnySubscriber = rls.onWrite('*',function(event){console.log('hello', event)})
 
+// new feature: execute subscribers sync. default is async by `document.dispatchEvent`
+rls.on({
+    event:'get',
+    key:'ok',
+    listener(detail){console.log(detail)},
+    sync: true,
+})
+
 ```
 
 How it works: 
