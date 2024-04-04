@@ -187,7 +187,9 @@ const allWatchers = {
   set: {},
   remove: {},
   clear: {},
-}
+};
+
+const Cache = {};
 
 function SetupStorage(block: Storage): Rumble.ReactiveStorage {
     let reactiveWrapper = {
@@ -212,9 +214,8 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             );
         },
         $__dispatchSync(ev: Rumble.Event, details: any) {
-            const watchers = (allWatchers[ev]['*'] || []).concat( allWatchers[ev][details.key] || []);
-            if (watchers.length > 0) {
-                watchers.forEach(fn => {
+            if (allWatchers[ev][details.key] && allWatchers[ev][details.key].length > 0) {
+                allWatchers[ev][details.key].forEach(fn => {
                     fn(details);
                 });
             }
@@ -229,7 +230,13 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         getItem(key: string) {
-            let reflect = block.getItem(key);
+            let reflect;
+            if (key in Cache)
+                reflect = Cache[key];
+            else{
+                reflect = block.getItem(key);
+                Cache[key] = reflect;
+            }
             if (reflect) {
                 this.$__dispatch("get",
                     {
@@ -242,22 +249,47 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         getString(key: string) {
-            return block.getItem(key);
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = block.getItem(key);
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getObject(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "object");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "object");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getNumber(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "number");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "number");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getBoolean(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "boolean");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "boolean");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getMatches(pattern: string | RegExp) {
@@ -288,6 +320,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setItem(key: string, value: string) {
             let previous = this.getItem(key);
             block.setItem(key, value);
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -301,6 +334,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setObject(key: string, value: any) {
             let previous = this.getItem(key);
             block.setItem(key, JSON.stringify(value));
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -314,6 +348,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setNumber(key: string, value: number) {
             let previous = this.getItem(key);
             block.setItem(key, value + '');
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -327,6 +362,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setBoolean(key: string, value: boolean) {
             let previous = this.getItem(key);
             block.setItem(key, value+"");
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -340,6 +376,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setString(key: string, value: string) {
             let previous = this.getItem(key);
             block.setItem(key, value);
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -353,6 +390,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         removeItem(key: string) {
             let value = this.getItem(key);
             block.removeItem(key);
+            delete Cache[key];
             this.$__dispatch(
                 "remove",
                 {
@@ -364,6 +402,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
 
         clear() {
             block.clear();
+            Cache = {};
             this.$__dispatch(
                 "clear",
                 {
