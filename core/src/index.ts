@@ -323,7 +323,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setDefault(key: string, value: string, type?: StorageTypes){
             const item = block.getItem(key);
             if(null === item){
-                if(type)
+                if(!type)
                     this.setItem(key, value)
                 else{
                     const method = type.charAt(0).toUpperCase() + type.slice(1);
