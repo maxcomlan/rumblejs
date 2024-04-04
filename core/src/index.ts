@@ -39,6 +39,7 @@ export declare namespace Rumble {
          * Dispatches a storage event on Window objects holding an equivalent Storage object.
          */
         clear(): void;
+        clearCache(): void;
 
         /** Returns the current value associated with the given key, or null if the given key does not exist. */
         getItem(key: string): string | null;
@@ -426,6 +427,10 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
                 }
             );
         },
+
+        clearCache(){
+            Cache = {};
+        }
 
         on(params: Rumble.SubscribeParams) {
 
