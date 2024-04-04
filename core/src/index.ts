@@ -214,8 +214,9 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             );
         },
         $__dispatchSync(ev: Rumble.Event, details: any) {
-            if (allWatchers[ev][details.key] && allWatchers[ev][details.key].length > 0) {
-                allWatchers[ev][details.key].forEach(fn => {
+            const watchers = (allWatchers[ev]['*'] || []).concat( allWatchers[ev][details.key] || []);
+            if (watchers.length > 0) {
+                watchers.forEach(fn => {
                     fn(details);
                 });
             }
