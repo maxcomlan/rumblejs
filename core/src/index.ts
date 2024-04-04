@@ -68,6 +68,8 @@ export declare namespace Rumble {
          * Dispatches a storage event on Window objects holding an equivalent Storage object.
          */
         removeItem(key: string): void;
+
+        setDefault(key: string, value: string, type?: StorageTypes): void;
         /**
          * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
          *
@@ -316,6 +318,18 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
                 }
             }
             return matches;
+        },
+
+        setDefault(key: string, value: string, type?: StorageTypes){
+            const item = block.getItem(key);
+            if(null === item){
+                if(type)
+                    this.setItem(key, value)
+                else{
+                    const method = type.charAt(0).toUpperCase() + type.slice(1);
+                    this['set'+method](key, value)
+                }
+            }
         },
 
         setItem(key: string, value: string) {
