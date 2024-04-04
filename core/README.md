@@ -52,6 +52,8 @@ rls.on({
     listener(detail){console.log('key "age" is fetched')},
 })
 
+// new feature: set value only if there is no pre-existing key
+rls.setDefault('timeDiff', 0, 'Number')
 ```
 
 How it works: 
