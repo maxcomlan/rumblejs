@@ -35,6 +35,30 @@ removeSubscriber.cancel();
 clearSubscriber.cancel();
 /// same for other subscribers
 
+// new feature: listen read/write on any key using '*'
+const writeAnySubscriber = rls.onWrite('*',function(event){console.log('hello', event)})
+
+// new feature: execute subscribers sync.
+// this feature is not useful, as I wrongly thought `document.dispatchEvent` is async
+rls.on({
+    event:'get',
+    key:'*',
+    sync: true,
+    listener(detail){console.log(detail)},
+})
+rls.on({
+    event:'get',
+    key:'age',
+    sync: true,
+    listener(detail){console.log('key "age" is fetched')},
+})
+
+// new feature: Cache
+// clear Cache
+rls.clearCache()
+
+// new feature: set value only if there is no pre-existing key
+rls.setDefault('timeDiff', 0, 'Number')
 ```
 
 How it works: 

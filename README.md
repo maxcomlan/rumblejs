@@ -1,3 +1,8 @@
+# scil
+
+[add some some features](https://github.com/scil/rumblejs/tree/master/core)
+
+
 # Vee
 
 Le stockage local avec `sessionStorage` ou `localStorage`. Mais réactif.

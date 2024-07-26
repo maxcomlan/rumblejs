@@ -26,6 +26,7 @@ export declare namespace Rumble {
         event: Event,
         listener: EventListener,
         key?: string,
+        sync?: boolean,
     }
 
     interface ReactiveStorage {
@@ -38,6 +39,7 @@ export declare namespace Rumble {
          * Dispatches a storage event on Window objects holding an equivalent Storage object.
          */
         clear(): void;
+        clearCache(): void;
 
         /** Returns the current value associated with the given key, or null if the given key does not exist. */
         getItem(key: string): string | null;
@@ -67,6 +69,8 @@ export declare namespace Rumble {
          * Dispatches a storage event on Window objects holding an equivalent Storage object.
          */
         removeItem(key: string): void;
+
+        setDefault(key: string, value: string, type?: StorageTypes): void;
         /**
          * Sets the value of the pair identified by key to value, creating a new key/value pair if none existed for key previously.
          *
@@ -181,6 +185,15 @@ export function cast(value: string | null | undefined, type: Rumble.Types = "str
     }
 }
 
+const allWatchers = {
+  get: {},
+  set: {},
+  remove: {},
+  clear: {},
+};
+
+const Cache = {};
+
 function SetupStorage(block: Storage): Rumble.ReactiveStorage {
     let reactiveWrapper = {
         $__id: crypto.randomUUID(),
@@ -189,6 +202,8 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             return `storage.reactive.${this.$__id}/${ev}`;
         },
         $__dispatch(ev: Rumble.Event, details: any) {
+            this.$__dispatchSync(ev, details);
+            
             document.dispatchEvent(
                 new CustomEvent<Rumble.Reaction>(
                     this.$__buildEvent(ev),
@@ -201,6 +216,14 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
                 )
             );
         },
+        $__dispatchSync(ev: Rumble.Event, details: any) {
+            const watchers = (allWatchers[ev]['*'] || []).concat( allWatchers[ev][details.key] || []);
+            if (watchers.length > 0) {
+                watchers.forEach(fn => {
+                    fn(details);
+                });
+            }
+        },
 
         get length() {
             return block.length;
@@ -211,7 +234,13 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         getItem(key: string) {
-            let reflect = block.getItem(key);
+            let reflect;
+            if (key in Cache)
+                reflect = Cache[key];
+            else{
+                reflect = block.getItem(key);
+                Cache[key] = reflect;
+            }
             if (reflect) {
                 this.$__dispatch("get",
                     {
@@ -224,22 +253,47 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         },
 
         getString(key: string) {
-            return block.getItem(key);
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = block.getItem(key);
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getObject(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "object");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "object");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getNumber(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "number");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "number");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getBoolean(key: string) {
-            let item = block.getItem(key);
-            return cast(item, "boolean");
+            let item;
+            if (key in Cache)
+                item = Cache[key];
+            else{
+                item = cast(block.getItem(key), "boolean");
+                Cache[key] = item;
+            }
+            return item;
         },
 
         getMatches(pattern: string | RegExp) {
@@ -267,9 +321,22 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             return matches;
         },
 
+        setDefault(key: string, value: string, type?: StorageTypes){
+            const item = block.getItem(key);
+            if(null === item){
+                if(!type)
+                    this.setItem(key, value)
+                else{
+                    const method = type.charAt(0).toUpperCase() + type.slice(1);
+                    this['set'+method](key, value)
+                }
+            }
+        },
+
         setItem(key: string, value: string) {
             let previous = this.getItem(key);
             block.setItem(key, value);
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -283,6 +350,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setObject(key: string, value: any) {
             let previous = this.getItem(key);
             block.setItem(key, JSON.stringify(value));
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -296,6 +364,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setNumber(key: string, value: number) {
             let previous = this.getItem(key);
             block.setItem(key, value + '');
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -309,6 +378,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setBoolean(key: string, value: boolean) {
             let previous = this.getItem(key);
             block.setItem(key, value+"");
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -322,6 +392,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         setString(key: string, value: string) {
             let previous = this.getItem(key);
             block.setItem(key, value);
+            Cache[key] = value;
             this.$__dispatch(
                 "set",
                 {
@@ -335,6 +406,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
         removeItem(key: string) {
             let value = this.getItem(key);
             block.removeItem(key);
+            delete Cache[key];
             this.$__dispatch(
                 "remove",
                 {
@@ -346,6 +418,7 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
 
         clear() {
             block.clear();
+            Cache = {};
             this.$__dispatch(
                 "clear",
                 {
@@ -355,10 +428,35 @@ function SetupStorage(block: Storage): Rumble.ReactiveStorage {
             );
         },
 
+        clearCache(){
+            Cache = {};
+        }
+
         on(params: Rumble.SubscribeParams) {
+
+            if(params.sync){
+                const watchers = allWatchers[params.event];
+                if (!watchers[params.key]) {
+                    watchers[params.key] = [];
+                }
+
+                const index = watchers[params.key].push(params.listener) -1;
+                let subscription: Rumble.Subscription = {
+                    id: crypto.randomUUID(),
+                    key: params.key,
+                    event: params.event,
+                    listener: params.listener,
+                    cancel() {
+                        return allWatchers[params.event][params.key].splice(index, 1);
+                    }
+                };
+                return subscription;
+            }
+
+            
             let rx = this;
             let documentListener = (ev: CustomEvent<Rumble.Reaction>) => {
-                if (ev.detail.key === params.key && ev.detail.event === params.event) {
+                if (( params.key === '*' || ev.detail.key === params.key ) && ev.detail.event === params.event) {
                     params.listener(ev.detail);
                 }
             }
